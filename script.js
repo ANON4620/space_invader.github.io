@@ -1,44 +1,28 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth - 10;
-canvas.height = window.innerHeight - 10;
 
 const game = {
-	loop() {
-		for(let i = 0; i < bullet.y.length; i++) {
-			ctx.clearRect(bullet.x[i], bullet.y[i], bullet.width, bullet.height);
-			bullet.y[i] -= 10;
-			ctx.fillRect(bullet.x[i], bullet.y[i], bullet.width, bullet.height);
-		}
-		if(bullet.y[0] < 0) {
-			ctx.clearRect(bullet.x[0], bullet.y[0], bullet.width, bullet.height);
-			bullet.x.shift();
-			bullet.y.shift();
-		}
-		if(bullet.y.length === 0) {
-			return;
-		}
-
-		setTimeout(() => {
-			requestAnimationFrame(game.loop);
-		}, 10);
+	clearCanvas() {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
 	}
 };
 
 const player = {
 	x: canvas.width / 2,
-	y: canvas.height - 40,
+	y: null,
 	width: 30,
 	height: 30,
 
-	move(e) {
-		ctx.clearRect(player.x, player.y, canvas.width, canvas.height);
-
-		player.x = e.clientX;
-		if(player.x <= 0 || (player.x + player.width) >= canvas.width)
-			return;
-		
+	draw() {
 		ctx.fillRect(player.x, player.y, player.width, player.height);
+	},
+
+	moveWithMouse(e) {
+		player.x = e.clientX - (player.width / 2);
+	},
+
+	moveWithTouch(e) {
+		player.x = e.touches[0].clientX - (player.width / 2);
 	}
 };
 
@@ -48,24 +32,111 @@ const bullet = {
 	width: 10,
 	height: player.height,
 
+	draw() {
+		for(let i = 0; i < bullet.y.length; i++) {
+			ctx.fillRect(bullet.x[i], bullet.y[i], bullet.width, bullet.height);
+		}
+	},
+
 	fire() {
 		bullet.x.push(player.x + bullet.width);
-		bullet.y.push(player.y - player.height);
-		if(bullet.y.length === 1) {
-			requestAnimationFrame(game.loop);
+		bullet.y.push(player.y - bullet.height);
+	},
+
+	move() {
+		// if no more bullets in array then exit function
+		if(bullet.y.length === 0) {
+			return;
 		}
+
+		for(let i = 0; i < bullet.y.length; i++) {
+			bullet.y[i] -= 10;
+		}
+
+		if((bullet.y[0] + bullet.height) <= 0) {
+			bullet.delete();
+		}
+	},
+
+	delete() {
+		// if no more bullets in array then exit function
+		if(bullet.y.length === 0) {
+			return;
+		}
+
+		bullet.x.shift();
+		bullet.y.shift();
 	}
 };
 
-let firing;
+const enemy = {
+	x: [],
+	y: [],
+	width: player.width,
+	height: player.height,
 
-canvas.addEventListener("mousemove", player.move);
-canvas.addEventListener("mousedown", () => {
-	bullet.fire();
-	firing = setInterval(bullet.fire, 100);
-});
-canvas.addEventListener("mouseup", () => {
-	clearInterval(firing);
-});
+	draw() {
+		for(let i = 0; i < enemy.y.length; i++) {
+			ctx.fillRect(enemy.x[i], enemy.y[i], enemy.width, enemy.height);
+		}
+	},
 
-ctx.fillRect(player.x, player.y, player.width, player.height);
+	create() {
+		enemy.x.push(randomRange(0, canvas.width - enemy.width));
+		enemy.y.push(-enemy.height);
+
+		setTimeout(() => {
+			requestAnimationFrame(enemy.create);
+		}, 3000);
+	},
+
+	move() {
+		// if no more enemies left in array then exit function
+		if(enemy.y.length === 0) {
+			return;
+		}
+
+		for(let i = 0; i < enemy.x.length; i++) {
+			enemy.y[i]++;
+		}
+
+		if(enemy.y[0] >= canvas.height) {
+			enemy.delete();
+		}
+	},
+
+	delete() {
+		// if no more enemies left in array then exit function
+		if(enemy.y.length === 0) {
+			return;
+		}
+
+		enemy.x.shift();
+		enemy.y.shift();
+	}
+};
+
+function randomRange(min, max) {
+	return Math.random() * (max - min + 1) + min;
+}
+
+function main() {
+	game.clearCanvas();
+
+	player.draw();
+	bullet.draw();
+	enemy.draw();
+
+	enemy.move();
+	bullet.move();
+
+	setTimeout(() => {
+		requestAnimationFrame(main);
+	}, 10);
+}
+
+
+
+player.y = canvas.height - (player.height + 10);
+requestAnimationFrame(enemy.create);
+requestAnimationFrame(main);
