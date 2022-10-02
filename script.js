@@ -5,6 +5,8 @@ const player_sprite = document.getElementById("player-sprite");
 const bullet_sprite = document.getElementById("bullet-sprite");
 const enemy_sprite = document.getElementById("enemy-sprite");
 
+canvas.width = window.innerWidth - 4;
+canvas.height = window.innerHeight - 4;
 
 const background = {
 	x: 0,
