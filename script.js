@@ -1,26 +1,38 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const bg = document.getElementById("background");
+const player_sprite = document.getElementById("player-sprite");
+const bullet_sprite = document.getElementById("bullet-sprite");
+const enemy_sprite = document.getElementById("enemy-sprite");
 
-const game = {
-	clear() {
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-	},
+
+const background = {
+	x: 0,
+	y: 0,
+	width: canvas.width,
+	height: canvas.height,
 
 	draw() {
-		player.draw();
-		bullet.draw();
-		enemy.draw();
+		ctx.drawImage(bg, background.x, background.y, canvas.width, canvas.height);
+		ctx.drawImage(bg, background.x, background.y - background.height, background.width, background.height);
+	},
+
+	slide() {
+		background.y += 0.5;
+		if(background.y >= canvas.height) {
+			background.y = 0;
+		}
 	}
 };
 
 const player = {
 	x: canvas.width / 2,
 	y: null,
-	width: 30,
-	height: 30,
+	width: 40,
+	height: 40,
 
 	draw() {
-		ctx.fillRect(player.x, player.y, player.width, player.height);
+		ctx.drawImage(player_sprite, player.x, player.y, player.width, player.height);
 	},
 
 	restrictCanvas() {
@@ -46,17 +58,17 @@ const player = {
 
 const bullet = {
 	arr: [],
-	width: 10,
+	width: 30,
 	height: player.height,
 
 	draw() {
 		for(let i = 0; i < bullet.arr.length; i++) {
-			ctx.fillRect(bullet.arr[i].x, bullet.arr[i].y, bullet.width, bullet.height);
+			ctx.drawImage(bullet_sprite, bullet.arr[i].x, bullet.arr[i].y, bullet.width, bullet.height);
 		}
 	},
 
 	fire() {
-		bullet.arr.push({x: player.x + bullet.width, y: player.y});
+		bullet.arr.push({x: player.x + (player.width / 2 - bullet.width / 2), y: player.y});
 	},
 
 	move() {
@@ -106,7 +118,7 @@ const enemy = {
 
 	draw() {
 		for(let i = 0; i < enemy.arr.length; i++) {
-			ctx.fillRect(enemy.arr[i].x, enemy.arr[i].y, enemy.width, enemy.height);
+			ctx.drawImage(enemy_sprite, enemy.arr[i].x, enemy.arr[i].y, enemy.width, enemy.height);
 		}
 	},
 
@@ -148,16 +160,25 @@ const enemy = {
 	}
 };
 
+const game = {
+	draw() {
+		background.draw();
+		bullet.draw();
+		player.draw();
+		enemy.draw();
+	}
+};
+
 function randomRange(min, max) {
 	return Math.random() * (max - min + 1) + min;
 }
 
 function main() {
-	game.clear();
 	game.draw();
 
 	enemy.move();
 	bullet.move();
+	background.slide();
 
 	for(let i = 0; i < bullet.arr.length; i++) {
 		for(let j = 0; j < enemy.arr.length; j++) {
