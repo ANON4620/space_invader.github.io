@@ -20,9 +20,11 @@ const background = {
 	},
 
 	slide() {
-		background.y += 0.5;
 		if(background.y >= canvas.height) {
 			background.y = 0;
+		}
+		else {
+			background.y += 0.5;
 		}
 	}
 };

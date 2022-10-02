@@ -1,19 +1,17 @@
-let firing;
+let mouseFiring, touchFiring;
 
 canvas.addEventListener("mousedown", () => {
-	bullet.fire();
-	firing = setInterval(bullet.fire, 150);
+	mouseFiring = setInterval(bullet.fire, 150);
 });
 canvas.addEventListener("mousemove", player.moveWithMouse);
 canvas.addEventListener("mouseup", () => {
-	clearInterval(firing);
+	clearInterval(mouseFiring);
 });
 
 canvas.addEventListener("touchstart", () => {
-	bullet.fire();
-	firing = setInterval(bullet.fire, 150);
+	touchFiring = setInterval(bullet.fire, 150);
 });
 canvas.addEventListener("touchmove", player.moveWithTouch);
 canvas.addEventListener("touchend", () => {
-	clearInterval(firing);
+	clearInterval(touchFiring);
 });
