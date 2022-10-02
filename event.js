@@ -9,6 +9,7 @@ canvas.addEventListener("mouseup", () => {
 });
 
 canvas.addEventListener("touchstart", () => {
+	bullet.fire();
 	touchFiring = setInterval(bullet.fire, 150);
 });
 canvas.addEventListener("touchmove", player.moveWithTouch);
