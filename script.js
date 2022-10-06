@@ -91,17 +91,20 @@ const bullet = {
 	},
 
 	delete(bulletIndex) {
-		if(bulletIndex === 0) {
-			bullet.arr.shift();
-		}
-		else {
-			for(let i = bulletIndex; i < bullet.arr.length - 1; i++) {
-				bullet.arr[i].x = bullet.arr[i + 1].x;
-				bullet.arr[i].y = bullet.arr[i + 1].y;
-			}
-
-			bullet.arr.pop();
-		}
+		if(bulletIndex <= bullet.arr.length / 2) {
+	    		for(let i = bulletIndex; i > 0; i--) {
+	      			bullet.arr[i] = bullet.arr[i - 1];
+	    		}
+			
+	    		bullet.arr.shift();
+	  	}
+	  	else {
+		  	for(let i = bulletIndex; i < bullet.arr.length - 1; i++) {
+			  	bullet.arr[i] = bullet.arr[i + 1];
+		  	}
+			
+		  	bullet.arr.pop();
+	  	}
 	},
 
 	touchesEnemy(bulletIndex, enemyIndex) {
@@ -150,17 +153,20 @@ const enemy = {
 	},
 
 	delete(enemyIndex) {
-		if(enemyIndex === 0) {
-			enemy.arr.shift();
-		}
-		else {
+		if(enemyIndex <= enemy.arr.length / 2) {
+	    		for(let i = enemyIndex; i > 0; i--) {
+	      			enemy.arr[i] = enemy.arr[i - 1];
+	    		}
+	    
+	    		enemy.arr.shift();
+	  	}
+	  	else {
 			for(let i = enemyIndex; i < enemy.arr.length - 1; i++) {
-				enemy.arr[i].x = enemy.arr[i + 1].x;
-				enemy.arr[i].y = enemy.arr[i + 1].y;
+				enemy.arr[i] = enemy.arr[i + 1];
 			}
 
 			enemy.arr.pop();
-		}
+	  	}
 	}
 };
 
@@ -186,10 +192,11 @@ function main() {
 
 	for(let i = 0; i < bullet.arr.length; i++) {
 		for(let j = 0; j < enemy.arr.length; j++) {
-			if(bullet.touchesEnemy(i, j))
-			{
+			if(bullet.touchesEnemy(i, j)) {
 				bullet.delete(i);
 				enemy.delete(j);
+				i--;
+				break;
 			}
 		}
 	}
