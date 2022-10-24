@@ -32,8 +32,8 @@ const background = {
 const player = {
 	x: canvas.width / 2,
 	y: null,
-	width: 40,
-	height: 40,
+	width: 60,
+	height: 60,
 
 	draw() {
 		ctx.drawImage(player_sprite, player.x, player.y, player.width, player.height);
@@ -122,15 +122,26 @@ const enemy = {
 	arr: [],
 	width: player.width,
 	height: player.height,
+	costume: {
+		x: [0, 467, 934],
+		y: [0, 311, 622],
+		width: 467,
+		height: 311
+	},
 
 	draw() {
 		for(let i = 0; i < enemy.arr.length; i++) {
-			ctx.drawImage(enemy_sprite, enemy.arr[i].x, enemy.arr[i].y, enemy.width, enemy.height);
+			ctx.drawImage(enemy_sprite, enemy.arr[i].src_x, enemy.arr[i].src_y, enemy.costume.width, enemy.costume.height, enemy.arr[i].x, enemy.arr[i].y, enemy.width, enemy.height);
 		}
 	},
 
 	create() {
-		enemy.arr.push({x: randomRange(0, canvas.width - enemy.width), y: -enemy.height});
+		enemy.arr.push({
+			src_x: enemy.costume.x[parseInt(Math.random() * 3)],
+			src_y: enemy.costume.y[parseInt(Math.random() * 3)],
+			x: randomRange(0, canvas.width - enemy.width),
+			y: -enemy.height
+		});
 
 		setTimeout(() => {
 			requestAnimationFrame(enemy.create);
