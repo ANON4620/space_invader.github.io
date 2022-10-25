@@ -1,4 +1,5 @@
 let mouseFiring, touchFiring;
+let xDown;
 
 canvas.addEventListener("mousedown", event => {
 	bullet.fire();
@@ -16,12 +17,19 @@ canvas.addEventListener("mouseup", event => {
 });
 
 canvas.addEventListener("touchstart", event => {
+	xDown = event.clientX;
 	bullet.fire();
 	touchFiring = setInterval(bullet.fire, 250);
 	event.preventDefault();
 });
 canvas.addEventListener("touchmove", event => {
-	player.x = event.touches[0].clientX - (player.width / 2);
+	const xUp = event.clientX;
+	const xDiff = xDown - xUp;
+
+	if(!xDiff) {
+		player.x = event.touches[0].clientX - (player.width / 2);
+	}
+
 	player.restrictCanvas();
 	event.preventDefault();
 });
