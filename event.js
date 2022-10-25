@@ -28,9 +28,9 @@ canvas.addEventListener("touchmove", event => {
 
 	if(!xDiff) {
 		player.x = event.touches[0].clientX - (player.width / 2);
+		player.restrictCanvas();
 	}
 
-	player.restrictCanvas();
 	event.preventDefault();
 });
 canvas.addEventListener("touchend", event => {
