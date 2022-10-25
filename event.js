@@ -17,16 +17,16 @@ canvas.addEventListener("mouseup", event => {
 });
 
 canvas.addEventListener("touchstart", event => {
-	xDown = event.clientX;
+	xDown = event.touches[0].clientX;
 	bullet.fire();
 	touchFiring = setInterval(bullet.fire, 250);
 	event.preventDefault();
 });
 canvas.addEventListener("touchmove", event => {
-	const xUp = event.clientX;
+	const xUp = event.touches[0].clientX;
 	const xDiff = xDown - xUp;
 
-	if(!xDiff) {
+	if(xDiff > 4 || xDiff < -4) {
 		player.x = event.touches[0].clientX - (player.width / 2);
 		player.restrictCanvas();
 	}
