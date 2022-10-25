@@ -3,9 +3,9 @@ const ctx = canvas.getContext("2d");
 const bg = document.getElementById("background");
 const player_sprite = document.getElementById("player-sprite");
 const bullet_sprite = document.getElementById("bullet-sprite");
-const enemy_sprite = document.getElementById("enemy-sprite");
+const enemy_sprite = document.getElementById("enemy-spritesheet");
 
-canvas.width = window.innerWidth - 4;
+canvas.width = window.innerWidth - 2;
 canvas.height = window.innerHeight - 4;
 
 const background = {
@@ -19,7 +19,7 @@ const background = {
 		ctx.drawImage(bg, background.x, background.y - background.height, background.width, background.height);
 	},
 
-	slide() {
+	move() {
 		if(background.y >= canvas.height) {
 			background.y = 0;
 		}
@@ -32,8 +32,8 @@ const background = {
 const player = {
 	x: canvas.width / 2,
 	y: null,
-	width: 60,
-	height: 60,
+	width: 50,
+	height: 50,
 
 	draw() {
 		ctx.drawImage(player_sprite, player.x, player.y, player.width, player.height);
@@ -62,8 +62,9 @@ const player = {
 
 const bullet = {
 	arr: [],
-	width: 30,
-	height: player.height,
+	width: 10,
+	height: player.height / 2 + 10,
+	speed: 10,
 
 	draw() {
 		for(let i = 0; i < bullet.arr.length; i++) {
@@ -82,7 +83,7 @@ const bullet = {
 		}
 
 		for(let i = 0; i < bullet.arr.length; i++) {
-			bullet.arr[i].y -= 10;
+			bullet.arr[i].y -= bullet.speed;
 		}
 
 		if((bullet.arr[0].y + bullet.height) < 0) {
@@ -122,30 +123,31 @@ const enemy = {
 	arr: [],
 	width: player.width,
 	height: player.height,
+	speed: 1.5,
 	costume: {
-		x: [0, 467, 934],
-		y: [0, 311, 622],
-		width: 467,
-		height: 311
+		src_x: [0, 467, 934],
+		src_y: [0, 311, 622],
+		src_width: 467,
+		src_height: 311
 	},
 
 	draw() {
 		for(let i = 0; i < enemy.arr.length; i++) {
-			ctx.drawImage(enemy_sprite, enemy.arr[i].src_x, enemy.arr[i].src_y, enemy.costume.width, enemy.costume.height, enemy.arr[i].x, enemy.arr[i].y, enemy.width, enemy.height);
+			ctx.drawImage(enemy_sprite, enemy.arr[i].src_x, enemy.arr[i].src_y, enemy.costume.src_width, enemy.costume.src_height, enemy.arr[i].x, enemy.arr[i].y, enemy.width, enemy.height);
 		}
 	},
 
 	create() {
 		enemy.arr.push({
-			src_x: enemy.costume.x[parseInt(Math.random() * 3)],
-			src_y: enemy.costume.y[parseInt(Math.random() * 3)],
+			src_x: enemy.costume.src_x[parseInt(Math.random() * 3)],
+			src_y: enemy.costume.src_y[parseInt(Math.random() * 3)],
 			x: randomRange(0, canvas.width - enemy.width),
 			y: -enemy.height
 		});
 
 		setTimeout(() => {
 			requestAnimationFrame(enemy.create);
-		}, 3000);
+		}, 2000);
 	},
 
 	move() {
@@ -155,7 +157,7 @@ const enemy = {
 		}
 
 		for(let i = 0; i < enemy.arr.length; i++) {
-			enemy.arr[i].y++;
+			enemy.arr[i].y += enemy.speed;
 		}
 
 		if(enemy.arr[0].y > canvas.height) {
@@ -199,7 +201,7 @@ function main() {
 
 	enemy.move();
 	bullet.move();
-	background.slide();
+	background.move();
 
 	for(let i = 0; i < bullet.arr.length; i++) {
 		for(let j = 0; j < enemy.arr.length; j++) {

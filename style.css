@@ -3,6 +3,10 @@
 	padding: 0;
 }
 
+body {
+	background: #3A2E3F;
+}
+
 img {
 	display: none;
 }
