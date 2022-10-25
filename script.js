@@ -32,8 +32,8 @@ const background = {
 const player = {
 	x: canvas.width / 2,
 	y: null,
-	width: 50,
-	height: 50,
+	width: 40,
+	height: 40,
 
 	draw() {
 		ctx.drawImage(player_sprite, player.x, player.y, player.width, player.height);
@@ -47,16 +47,6 @@ const player = {
 		if((player.x + player.width) > canvas.width) {
 			player.x = canvas.width - player.width;
 		}
-	},
-
-	moveWithMouse(e) {
-		player.x = e.clientX - (player.width / 2);
-		player.restrictCanvas();
-	},
-
-	moveWithTouch(e) {
-		player.x = e.touches[0].clientX - (player.width / 2);
-		player.restrictCanvas();
 	}
 };
 
@@ -121,14 +111,13 @@ const bullet = {
 
 const enemy = {
 	arr: [],
-	width: player.width,
-	height: player.height,
-	speed: 1.5,
+	width: 50,
+	height: 50,
 	costume: {
-		src_x: [0, 467, 934],
-		src_y: [0, 311, 622],
-		src_width: 467,
-		src_height: 311
+		src_x: [15, 460, 900, 1330, 1830],
+		src_y: [0, 380, 785, 1185],
+		src_width: 450,
+		src_height: 360
 	},
 
 	draw() {
@@ -139,15 +128,16 @@ const enemy = {
 
 	create() {
 		enemy.arr.push({
-			src_x: enemy.costume.src_x[parseInt(Math.random() * 3)],
-			src_y: enemy.costume.src_y[parseInt(Math.random() * 3)],
+			src_x: enemy.costume.src_x[parseInt(Math.random() * enemy.costume.src_x.length)],
+			src_y: enemy.costume.src_y[parseInt(Math.random() * enemy.costume.src_y.length)],
 			x: randomRange(0, canvas.width - enemy.width),
-			y: -enemy.height
+			y: -enemy.height,
+			speed: randomRange(1, 2)
 		});
 
 		setTimeout(() => {
 			requestAnimationFrame(enemy.create);
-		}, 2000);
+		}, 1000);
 	},
 
 	move() {
@@ -157,7 +147,7 @@ const enemy = {
 		}
 
 		for(let i = 0; i < enemy.arr.length; i++) {
-			enemy.arr[i].y += enemy.speed;
+			enemy.arr[i].y += enemy.arr[i].speed;
 		}
 
 		if(enemy.arr[0].y > canvas.height) {
@@ -214,13 +204,11 @@ function main() {
 		}
 	}
 
-	setTimeout(() => {
-		requestAnimationFrame(main);
-	}, 10);
+	requestAnimationFrame(main);
 }
 
 
 
 player.y = canvas.height - (player.height + 10);
-requestAnimationFrame(enemy.create);
-requestAnimationFrame(main);
+enemy.create();
+main();
