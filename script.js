@@ -4,6 +4,7 @@ const bg = document.getElementById("background");
 const player_sprite = document.getElementById("player-sprite");
 const bullet_sprite = document.getElementById("bullet-sprite");
 const enemy_sprite = document.getElementById("enemy-spritesheet");
+const spark_sprite = document.getElementById("spark-spritesheet");
 
 canvas.width = window.innerWidth - 2;
 canvas.height = window.innerHeight - 4;
@@ -30,16 +31,16 @@ const background = {
 };
 
 const player = {
-	x: canvas.width / 2,
+	x: null,
 	y: null,
-	width: 40,
+	width: 50,
 	height: 40,
 
 	draw() {
 		ctx.drawImage(player_sprite, player.x, player.y, player.width, player.height);
 	},
 
-	restrictCanvas() {
+	restrictPlayArea() {
 		if(player.x < 0) {
 			player.x = 0;
 		}
@@ -53,8 +54,17 @@ const player = {
 const bullet = {
 	arr: [],
 	width: 10,
-	height: player.height / 2 + 10,
+	height: (player.height / 2) + 10,
 	speed: 10,
+	creation_delay: 250,
+	spark: {
+		src_x: [0, 230, 495],
+		src_y: 0,
+		src_width: 200,
+		src_height: 200,
+		width: 30,
+		height: 30
+	},
 
 	draw() {
 		for(let i = 0; i < bullet.arr.length; i++) {
@@ -79,6 +89,10 @@ const bullet = {
 		if((bullet.arr[0].y + bullet.height) < 0) {
 			bullet.delete(0);
 		}
+	},
+
+	hitSpark(bulletIndex) {
+		ctx.drawImage(spark_sprite, bullet.spark.src_x[parseInt(Math.random() * bullet.spark.src_x.length)], bullet.spark.src_y, bullet.spark.src_width, bullet.spark.src_height, bullet.arr[bulletIndex].x - 7, bullet.arr[bulletIndex].y - (bullet.spark.height / 2), bullet.spark.width, bullet.spark.height);
 	},
 
 	delete(bulletIndex) {
@@ -111,8 +125,9 @@ const bullet = {
 
 const enemy = {
 	arr: [],
-	width: 50,
+	width: 60,
 	height: 50,
+	creation_delay: 1000,
 	costume: {
 		src_x: [15, 460, 900, 1330, 1830],
 		src_y: [0, 380, 785, 1185],
@@ -135,9 +150,12 @@ const enemy = {
 			speed: randomRange(1, 2)
 		});
 
+		if(game.stop)
+			return;
+
 		setTimeout(() => {
 			requestAnimationFrame(enemy.create);
-		}, 1000);
+		}, enemy.creation_delay);
 	},
 
 	move() {
@@ -157,11 +175,11 @@ const enemy = {
 
 	delete(enemyIndex) {
 		if(enemyIndex <= enemy.arr.length / 2) {
-	    		for(let i = enemyIndex; i > 0; i--) {
-	      			enemy.arr[i] = enemy.arr[i - 1];
-	    		}
+	    	for(let i = enemyIndex; i > 0; i--) {
+	      		enemy.arr[i] = enemy.arr[i - 1];
+	    	}
 	    
-	    		enemy.arr.shift();
+	    	enemy.arr.shift();
 	  	}
 	  	else {
 			for(let i = enemyIndex; i < enemy.arr.length - 1; i++) {
@@ -174,6 +192,8 @@ const enemy = {
 };
 
 const game = {
+	stop: false,
+
 	draw() {
 		background.draw();
 		bullet.draw();
@@ -196,6 +216,7 @@ function main() {
 	for(let i = 0; i < bullet.arr.length; i++) {
 		for(let j = 0; j < enemy.arr.length; j++) {
 			if(bullet.touchesEnemy(i, j)) {
+				bullet.hitSpark(i);
 				bullet.delete(i);
 				enemy.delete(j);
 				i--;
@@ -204,11 +225,14 @@ function main() {
 		}
 	}
 
+	if(game.stop)
+		return;
+
 	requestAnimationFrame(main);
 }
 
 
-
-player.y = canvas.height - (player.height + 10);
+player.x = (canvas.width / 2) - (player.width / 2);
+player.y = canvas.height - (player.height + 30);
 enemy.create();
 main();
